@@ -1,0 +1,7 @@
+
+{
+  "employees": [
+    {"name": "محمد", "department": "الكيمياء"},
+    {"name": "سعيد", "department": "الأحياء"}
+  ]
+}
