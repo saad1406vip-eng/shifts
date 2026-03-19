@@ -1,0 +1,29 @@
+body {
+    font-family: Arial;
+    direction: rtl;
+    text-align: center;
+    background: #f5f5f5;
+}
+
+table {
+    border-collapse: collapse;
+    margin: auto;
+    background: white;
+}
+
+td, th {
+    border: 1px solid #000;
+    padding: 4px;
+    font-size: 11px;
+}
+
+button {
+    margin:2px;
+    padding:3px 6px;
+    cursor:pointer;
+}
+
+.controls input, .controls select, .controls button {
+    margin:5px;
+    padding:6px;
+}
