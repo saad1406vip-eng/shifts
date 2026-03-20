@@ -1,0 +1,47 @@
+body {
+    font-family: Arial;
+    direction: rtl;
+    text-align: center;
+    background: #f5f5f5;
+}
+
+table {
+    border-collapse: collapse;
+    margin: auto;
+    background: white;
+    width: 95%;
+    table-layout: fixed;
+}
+
+td, th {
+    border: 1px solid #000;
+    padding: 4px;
+    font-size: 11px;
+    text-align: center;
+}
+
+td.draggable {
+    cursor: grab;
+    user-select: none;
+}
+
+.dragging {
+    position: absolute;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.9;
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.placeholder {
+    background: #e2e3e5 !important;
+    border: 2px dashed #000;
+    height: 24px;
+    margin: 2px 0;
+}
+
+.controls input, .controls select, .controls button {
+    margin:5px;
+    padding:6px;
+}
