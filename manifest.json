@@ -1,0 +1,15 @@
+{
+  "name": "ورديات المختبر",
+  "short_name": "الورديات",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0d1a2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
