@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Lab Shifts"/>
+  <meta name="theme-color" content="#ffffff"/>
+  <title>Lab Shifts Schedule - Asir Health Cluster</title>
+  
+  <style>
+    /* ═════════════════════════════════════════════════════ */
+    /* RESET & GLOBAL STYLES */
+    /* ═════════════════════════════════════════════════════ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    input, select, button {
+      font-family: inherit;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    ::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #e2e8f0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 3px;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* HEADER */
+    /* ═════════════════════════════════════════════════════ */
+    #header {
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-bottom: 1px solid #cbd5e1;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    #header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0369a1;
+      margin-bottom: 12px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .controls input[type="month"],
+    .controls input[type="text"],
+    .controls select {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-green {
+      background: #f0fdf4;
+      color: #16a34a;
+      border-color: #bbf7d0;
+    }
+
+    .btn-blue {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+
+    .btn-amber {
+      background: #fffbeb;
+      color: #d97706;
+      border-color: #fde68a;
+    }
+
+    .btn-purple {
+      background: #faf5ff;
+      color: #7c3aed;
+      border-color: #ddd6fe;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* STATS BAR */
+    /* ═════════════════════════════════════════════════════ */
+    #statsBar {
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-chip {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      border: 1px solid;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* TABLE WRAPPER */
+    /* ═════════════════════════════════════════════════════ */
+    #tableWrap {
+      overflow: auto;
+      padding: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* TABLE STYLES */
+    /* ═════════════════════════════════════════════════════ */
+    #mainTable {
+      border-collapse: collapse;
+      background: #ffffff;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    #mainTable th {
+      background: #366092;
+      color: #ffffff;
+      padding: 8px 6px;
+      border: 1px solid #cbd5e1;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+    }
+
+    #mainTable th.col-name {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background: #1e40af;
+      min-width: 130px;
+      text-align: left;
+      padding-left: 8px;
+    }
+
+    #mainTable th.col-dept {
+      position: sticky;
+      left: 130px;
+      z-index: 20;
+      background: #1e40af;
+      min-width: 120px;
+    }
+
+    #mainTable td {
+      border: 1px solid #e2e8f0;
+      padding: 6px 4px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    #mainTable td.td-name {
+      position: sticky;
+      left: 0;
+      background: #ffffff;
+      font-size: 13px;
+      text-align: left;
+      padding-left: 8px;
+      font-weight: 600;
+      min-width: 130px;
+      border-right: 3px solid #93c5fd;
+    }
+
+    #mainTable td.td-dept {
+      position: sticky;
+      left: 130px;
+      background: #ffffff;
+      min-width: 120px;
+    }
+
+    #mainTable tr:hover td {
+      background: #f8fafc;
+    }
+
+    #mainTable tr:hover td.td-name,
+    #mainTable tr:hover td.td-dept {
+      background: #f0f9ff;
+    }
+
+    .dept-separator td {
+      border-top: 2px solid #3b82f6 !important;
+    }
+
+    .shift-sel {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      width: 40px;
+      padding: 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .shift-M {
+      color: #0369a1;
+      background: rgba(3,105,161,0.15);
+    }
+
+    .shift-E {
+      color: #b45309;
+      background: rgba(180,83,9,0.15);
+    }
+
+    .shift-N {
+      color: #6d28d9;
+      background: rgba(109,40,217,0.15);
+    }
+
+    .shift-O {
+      color: #94a3b8;
+      background: rgba(148,163,184,0.08);
+    }
+
+    .day-we {
+      background: #fee2e2 !important;
+      color: #dc2626 !important;
+      font-weight: 600;
+    }
+
+    .dept-sel {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 3px 4px;
+      width: 110px;
+      cursor: pointer;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+
+    .dragging-row {
+      opacity: 0.4;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* TOAST */
+    /* ═════════════════════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid #3b82f6;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: #60a5fa;
+      z-index: 999;
+      white-space: nowrap;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* MODALS */
+    /* ═════════════════════════════════════════════════════ */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 450px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .modal-section {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .modal-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .modal-input {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      width: 100%;
+      margin-bottom: 8px;
+      font-family: inherit;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 11px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .modal-btn-primary {
+      background: #22c55e;
+      color: #fff;
+    }
+
+    .modal-btn-secondary {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* ═════════════════════════════════════════════════════ */
+    /* PRINT STYLES */
+    /* ═════════════════════════════════════════════════════ */
+    @media print {
+      #header, #statsBar, #toast, .controls, .btn, 
+      .dept-sel, .del-btn {
+        display: none !important;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 8mm 10mm;
+      }
+
+      html, body {
+        background: #fff;
+        color: #000;
+        width: 100%;
+        height: auto;
+      }
+
+      /* Print Header */
+      #printHeader {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #1f4e78;
+      }
+
+      #printHeader div:first-child {
+        font-size: 16px;
+        font-weight: 700;
+        color: #000;
+      }
+
+      #printHeader div:nth-child(2) {
+        font-size: 14px;
+        font-weight: 700;
+        color: #000;
+        margin: 4px 0;
+      }
+
+      #printMonthTitle {
+        font-size: 12px;
+        color: #333;
+        margin-top: 4px;
+      }
+
+      /* Table */
+      #tableWrap {
+        overflow: visible !important;
+        padding: 0 !important;
+        margin-bottom: 16px;
+      }
+
+      #mainTable {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 8.5px;
+      }
+
+      #mainTable th {
+        background: #1f4e78 !important;
+        color: #fff !important;
+        padding: 5px 3px;
+        border: 1px solid #333;
+        font-weight: 700;
+        text-align: center;
+        position: static !important;
+      }
+
+      #mainTable th.col-name,
+      #mainTable th.col-dept {
+        position: static !important;
+        left: auto !important;
+        z-index: auto !important;
+      }
+
+      #mainTable th.col-name {
+        text-align: left;
+        padding-left: 6px;
+        min-width: 14%;
+      }
+
+      #mainTable th.col-dept {
+        min-width: 16%;
+      }
+
+      #mainTable td {
+        border: 1px solid #999 !important;
+        padding: 3px 2px;
+        text-align: center;
+        background: #fff !important;
+        color: #000 !important;
+        position: static !important;
+      }
+
+      #mainTable td.td-name {
+        text-align: left;
+        font-weight: 600;
+        padding-left: 5px;
+        background: #f9f9f9 !important;
+        min-width: 14%;
+        border-right: none !important;
+      }
+
+      #mainTable td.td-dept {
+        background: #f9f9f9 !important;
+        min-width: 16%;
+      }
+
+      .shift-sel {
+        display: inline;
+        background: transparent;
+        border: none;
+        font-weight: 700;
+        font-size: 8px;
+        padding: 0;
+        color: #000;
+      }
+
+      .shift-M { background: #d9e8f5 !important; }
+      .shift-E { background: #f4cccc !important; }
+      .shift-N { background: #fff2cc !important; }
+      .shift-O { background: #e2efda !important; }
+
+      #mainTable th.day-we {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+      }
+
+      #mainTable td.day-we {
+        background: #fee2e2 !important;
+      }
+
+      /* Legend */
+      #printLegend {
+        display: block !important;
+        margin-top: 12px;
+        margin-bottom: 16px;
+        font-size: 9px;
+      }
+
+      .legend-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+        font-size: 10px;
+      }
+
+      .legend-items {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .legend-box {
+        width: 16px;
+        height: 14px;
+        border: 1px solid #999;
+      }
+
+      .legend-label {
+        font-size: 9px;
+        color: #000;
+      }
+
+      /* Footer */
+      #printFooter {
+        display: block !important;
+        margin-top: 16px;
+        page-break-inside: avoid;
+      }
+
+      #signatureTable {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      #signatureTable td {
+        border: 1px solid #999 !important;
+        padding: 8px 10px;
+        text-align: center;
+        vertical-align: bottom;
+        height: 70px;
+        font-size: 10px;
+        font-weight: 600;
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      .sig-line {
+        border-top: 1px solid #000;
+        padding-top: 2px;
+        margin-top: 46px;
+        font-size: 8px;
+        font-weight: 400;
+        color: #666;
+      }
+
+      #mainTable tbody tr {
+        page-break-inside: avoid;
+      }
+    }
+
+    #printHeader, #printLegend, #printFooter {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <h1>🏥 Lab Shifts Schedule</h1>
+  <div class="controls">
+    <input type="month" id="monthPicker"/>
+    <button class="btn btn-green" onclick="showAddEmp()">➕ Add Staff</button>
+    <button class="btn btn-amber" onclick="autoSchedule()">🔄 Auto Schedule</button>
+    <button class="btn btn-blue" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-purple" onclick="exportCSV()">⬇️ Export CSV</button>
+    <button class="btn btn-amber" onclick="showManage()">⚙️ Manage</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div id="statsBar"></div>
+
+<!-- PRINT HEADER -->
+<div id="printHeader">
+  <div>Asir Health Cluster</div>
+  <div>Sabta Al-Alaya General Hospital</div>
+  <div id="printMonthTitle">September 2026 Work Schedule</div>
+</div>
+
+<!-- TABLE -->
+<div id="tableWrap">
+  <table id="mainTable"></table>
+</div>
+
+<!-- PRINT LEGEND -->
+<div id="printLegend">
+  <div class="legend-title">Shift Legend:</div>
+  <div class="legend-items">
+    <div class="legend-item">
+      <div class="legend-box" style="background:#d9e8f5"></div>
+      <span class="legend-label">M = Morning Shift</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box" style="background:#f4cccc"></div>
+      <span class="legend-label">E = Evening Shift</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box" style="background:#fff2cc"></div>
+      <span class="legend-label">N = Night Shift</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box" style="background:#e2efda"></div>
+      <span class="legend-label">O = Off / Leave</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT FOOTER -->
+<div id="printFooter">
+  <table id="signatureTable">
+    <tr>
+      <td style="width:50%">
+        <strong>Department Head Signature</strong>
+        <div class="sig-line">Name & Signature & Date</div>
+      </td>
+      <td style="width:50%">
+        <strong>Lab Supervisor Signature</strong>
+        <div class="sig-line">Name & Signature & Date</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Modal: Add Staff -->
+<div id="modalAddEmp" class="modal">
+  <div class="modal-content">
+    <div class="modal-header" style="color:#16a34a">➕ Add New Staff</div>
+    <div class="modal-section">
+      <input id="newName" type="text" placeholder="Staff Name" class="modal-input"/>
+      <select id="newDept" class="modal-input"></select>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="closeModals()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="addTech()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Manage -->
+<div id="modalManage" class="modal">
+  <div class="modal-content">
+    <div class="modal-header" style="color:#0369a1">⚙️ Manage Staff</div>
+    
+    <div class="modal-section">
+      <div class="modal-label" style="color:#ef4444">🗑 Delete Staff</div>
+      <select id="selDelEmp" class="modal-input"></select>
+      <button class="modal-btn" style="background:#ef4444;color:#fff" onclick="doDelEmp()">Delete Permanently</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label" style="color:#0369a1">✏️ Rename Staff</div>
+      <select id="selRenameEmp" class="modal-input"></select>
+      <input id="inputRenameEmp" type="text" placeholder="New Name" class="modal-input"/>
+      <button class="modal-btn" style="background:#0369a1;color:#fff" onclick="doRenameEmp()">Rename</button>
+    </div>
+
+    <button class="modal-btn modal-btn-secondary" onclick="closeModals()">Close</button>
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+// ════════════════════════════════════════════════════════
+// CONFIGURATION
+// ════════════════════════════════════════════════════════
+const DEPTS = [
+  "Department Head",
+  "Medical Director",
+  "Lab Supervisor",
+  "Chemistry & Virology",
+  "Hematology",
+  "Blood Bank",
+  "Serology",
+  "Microbiology",
+  "Reception"
+];
+
+const DEPT_COLORS = {
+  "Department Head": "#ef4444",
+  "Medical Director": "#f97316",
+  "Lab Supervisor": "#38bdf8",
+  "Chemistry & Virology": "#0ea5e9",
+  "Hematology": "#8b5cf6",
+  "Blood Bank": "#ec4899",
+  "Serology": "#22c55e",
+  "Microbiology": "#f59e0b",
+  "Reception": "#14b8a6"
+};
+
+const SHIFTS = ["M", "E", "N", "O"];
+const SHIFT_LABELS = { M: "Morning", E: "Evening", N: "Night", O: "Off" };
+const SHIFT_COLORS = { M: "#0ea5e9", E: "#f59e0b", N: "#a78bfa", O: "#64748b" };
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+                     "July", "August", "September", "October", "November", "December"];
+
+const LS_KEY = "lab_shifts_schedule_v1";
+
+let data = [
+  { name: "Saad Ali", dept: "Department Head" },
+  { name: "Dr. Hatem", dept: "Medical Director" },
+  { name: "Fahad Abdullah", dept: "Lab Supervisor" },
+  { name: "Mohammad Dokhail", dept: "Chemistry & Virology" },
+  { name: "Mesfer Ayed", dept: "Chemistry & Virology" },
+  { name: "Badr Mohammad", dept: "Chemistry & Virology" },
+  { name: "Mohammad Nasser", dept: "Chemistry & Virology" },
+  { name: "Hussam Saeed", dept: "Chemistry & Virology" },
+  { name: "Sultan Mohammad", dept: "Hematology" },
+  { name: "Hesham Saeed", dept: "Hematology" },
+  { name: "Saad Eid", dept: "Hematology" },
+  { name: "Mohammad Saad", dept: "Blood Bank" },
+  { name: "Naif Mahboob", dept: "Blood Bank" },
+  { name: "Mesfer Ayed", dept: "Serology" },
+  { name: "Mohammad Nasser", dept: "Serology" },
+  { name: "Mohammad Sohlan", dept: "Serology" },
+  { name: "Abdul Rahman", dept: "Microbiology" },
+  { name: "Abdul Aziz Al-Zahrani", dept: "Microbiology" },
+  { name: "Naif Mohammad", dept: "Microbiology" },
+  { name: "Mohammad Khalaf", dept: "Reception" }
+];
+
+let year, month, numDays;
+
+// ════════════════════════════════════════════════════════
+// LOCAL STORAGE
+// ════════════════════════════════════════════════════════
+function lsSave() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      data: data,
+      monthVal: document.getElementById("monthPicker").value
+    }));
+  } catch (e) {}
+}
+
+function lsLoad() {
+  try {
+    const stored = localStorage.getItem(LS_KEY);
+    if (!stored) return;
+    const parsed = JSON.parse(stored);
+    if (parsed.data) data = parsed.data;
+    if (parsed.monthVal) document.getElementById("monthPicker").value = parsed.monthVal;
+  } catch (e) {}
+}
+
+// ════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════
+function daysInMonth(m, y) {
+  return new Date(y, m, 0).getDate();
+}
+
+function getDayOfWeek(y, m, d) {
+  return new Date(y, m - 1, d).getDay();
+}
+
+function isWeekend(y, m, d) {
+  const dow = getDayOfWeek(y, m, d);
+  return dow === 5 || dow === 6;
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, 2400);
+}
+
+function ensureShifts(tech) {
+  if (!tech.shifts || tech.shifts.length !== numDays) {
+    tech.shifts = new Array(numDays).fill("O");
+  }
+}
+
+function sortData() {
+  const deptIdx = {};
+  DEPTS.forEach((d, i) => { deptIdx[d] = i; });
+  data.sort((a, b) => (deptIdx[a.dept] ?? 99) - (deptIdx[b.dept] ?? 99));
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════
+function render() {
+  const val = document.getElementById("monthPicker").value;
+  year = val ? parseInt(val.split("-")[0]) : new Date().getFullYear();
+  month = val ? parseInt(val.split("-")[1]) : new Date().getMonth() + 1;
+  numDays = daysInMonth(month, year);
+
+  data.forEach(ensureShifts);
+  sortData();
+
+  const printMonthTitle = document.getElementById("printMonthTitle");
+  if (printMonthTitle) {
+    printMonthTitle.textContent = MONTH_NAMES[month - 1] + " " + year + " Work Schedule";
+  }
+
+  let html = "<thead><tr>";
+  html += '<th class="col-name">Name</th><th class="col-dept">Department</th>';
+
+  for (let d = 1; d <= numDays; d++) {
+    const dow = getDayOfWeek(year, month, d);
+    const we = isWeekend(year, month, d);
+    const dayName = DAY_NAMES[dow];
+    html += '<th class="' + (we ? "day-we" : "") + '"><div>' + dayName + '</div><div>' + d + '</div></th>';
+  }
+
+  html += '<th>Total</th><th>Delete</th></tr></thead><tbody>';
+
+  let lastDept = null;
+  data.forEach((tech, i) => {
+    const deptColor = DEPT_COLORS[tech.dept] || "#64748b";
+    const separator = lastDept !== null && lastDept !== tech.dept;
+    lastDept = tech.dept;
+
+    const workDays = tech.shifts.filter(s => s !== "O").length;
+    html += '<tr data-index="' + i + '"' + (separator ? ' class="dept-separator"' : '') + ' draggable="true">';
+
+    html += '<td class="td-name" style="color:' + deptColor + '; border-right-color:' + deptColor + '">' + tech.name + '</td>';
+
+    html += '<td class="td-dept"><select class="dept-sel" onchange="changeDept(' + i + ', this.value)">';
+    DEPTS.forEach(d => {
+      html += '<option value="' + d + '"' + (tech.dept === d ? ' selected' : '') + '>' + d + '</option>';
+    });
+    html += '</select></td>';
+
+    for (let di = 0; di < numDays; di++) {
+      const s = tech.shifts[di] || "O";
+      const we = isWeekend(year, month, di + 1);
+      html += '<td' + (we ? ' class="day-we"' : '') + '>';
+      html += '<select class="shift-sel shift-' + s + '" onchange="setShift(' + i + ', ' + di + ', this.value)">';
+      SHIFTS.forEach(sh => {
+        html += '<option value="' + sh + '"' + (s === sh ? ' selected' : '') + '>' + sh + '</option>';
+      });
+      html += '</select></td>';
+    }
+
+    html += '<td style="color:#22c55e; font-weight:700">' + workDays + '</td>';
+    html += '<td><button class="del-btn" onclick="delTech(' + i + ')">🗑</button></td>';
+    html += '</tr>';
+  });
+
+  html += '<tr style="background:#f0f0f0"><td colspan="2" style="color:#94a3b8; font-size:11px; padding:6px">Total Staff</td>';
+  for (let di = 0; di < numDays; di++) {
+    let working = 0;
+    for (let i = 0; i < data.length; i++) {
+      if ((data[i].shifts[di] || "O") !== "O") working++;
+    }
+    const we = isWeekend(year, month, di + 1);
+    const col = working >= 15 ? "#22c55e" : working >= 10 ? "#f59e0b" : "#ef4444";
+    html += '<td style="color:' + col + '; font-weight:700' + (we ? '; background:#fee2e2' : '') + '">' + working + '</td>';
+  }
+  html += '<td colspan="2"></td></tr></tbody>';
+
+  document.getElementById("mainTable").innerHTML = html;
+  renderStats();
+  enableDrag();
+  lsSave();
+}
+
+function renderStats() {
+  const counts = { M: 0, E: 0, N: 0, O: 0 };
+  data.forEach(t => t.shifts.forEach(s => { counts[s] = (counts[s] || 0) + 1; }));
+
+  let html = '';
+  Object.entries(counts).forEach(([k, v]) => {
+    html += '<div class="stat-chip" style="background:' + SHIFT_COLORS[k] + '20; border:1px solid ' + SHIFT_COLORS[k] + '40">';
+    html += '<span style="color:' + SHIFT_COLORS[k] + '; font-weight:700">' + k + '</span>';
+    html += '<span style="color:#64748b; font-size:11px"> ' + SHIFT_LABELS[k] + ' ' + v + '</span>';
+    html += '</div>';
+  });
+
+  html += '<div class="stat-chip" style="background:#38bdf820; border:1px solid #38bdf840; margin-left:auto">';
+  html += '<span style="color:#38bdf8; font-weight:700">' + data.length + '</span>';
+  html += '<span style="color:#64748b; font-size:11px"> Staff Members</span>';
+  html += '</div>';
+
+  document.getElementById("statsBar").innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+// ACTIONS
+// ════════════════════════════════════════════════════════
+function setShift(i, di, v) {
+  data[i].shifts[di] = v;
+  const sel = document.querySelector('select[data-ti="' + i + '"][data-di="' + di + '"]');
+  if (sel) sel.className = "shift-sel shift-" + v;
+  renderStats();
+  lsSave();
+}
+
+function changeDept(i, v) {
+  data[i].dept = v;
+  render();
+}
+
+function delTech(i) {
+  if (!confirm("Delete " + data[i].name + "?")) return;
+  data.splice(i, 1);
+  render();
+  toast("🗑 Staff deleted");
+}
+
+function addTech() {
+  const name = document.getElementById("newName").value.trim();
+  const dept = document.getElementById("newDept").value;
+  if (!name) { toast("⚠️ Enter name"); return; }
+  if (data.find(t => t.name === name)) { toast("⚠️ Name already exists"); return; }
+  data.push({ name, dept, shifts: new Array(numDays).fill("O") });
+  document.getElementById("newName").value = "";
+  closeModals();
+  render();
+  toast("✅ " + name + " added");
+}
+
+function autoSchedule() {
+  if (!confirm("Auto schedule will clear current shifts. Continue?")) return;
+  const patterns = [
+    ["M", "M", "M", "M", "M", "O", "O"],
+    ["E", "E", "E", "E", "E", "O", "O"],
+    ["N", "N", "N", "N", "N", "O", "O"]
+  ];
+  data.forEach((tech, ti) => {
+    tech.shifts = [];
+    const pat = patterns[ti % patterns.length];
+    for (let d = 1; d <= numDays; d++) {
+      tech.shifts.push(isWeekend(year, month, d) ? "O" : pat[getDayOfWeek(year, month, d)] || "M");
+    }
+  });
+  render();
+  toast("✅ Auto schedule completed");
+}
+
+function exportCSV() {
+  let csv = "\uFEFF" + ["Name", "Department"].join(",");
+  for (let d = 1; d <= numDays; d++) {
+    csv += "," + DAY_NAMES[getDayOfWeek(year, month, d)] + " " + d;
+  }
+  csv += "\n";
+  data.forEach(t => {
+    csv += [t.name, t.dept].concat(t.shifts).join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv; charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "shifts_" + year + "_" + String(month).padStart(2, "0") + ".csv";
+  link.click();
+  URL.revokeObjectURL(url);
+  toast("✅ CSV exported");
+}
+
+function showAddEmp() {
+  const newDept = document.getElementById("newDept");
+  newDept.innerHTML = "";
+  DEPTS.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    newDept.appendChild(opt);
+  });
+  document.getElementById("newName").value = "";
+  document.getElementById("modalAddEmp").classList.add("show");
+  setTimeout(() => { document.getElementById("newName").focus(); }, 100);
+}
+
+function showManage() {
+  const selDel = document.getElementById("selDelEmp");
+  const selRen = document.getElementById("selRenameEmp");
+  selDel.innerHTML = "";
+  selRen.innerHTML = "";
+  
+  data.forEach((t, i) => {
+    const opt1 = document.createElement("option");
+    opt1.value = i;
+    opt1.textContent = t.name + " (" + t.dept + ")";
+    selDel.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = i;
+    opt2.textContent = t.name + " (" + t.dept + ")";
+    selRen.appendChild(opt2);
+  });
+
+  document.getElementById("inputRenameEmp").value = "";
+  document.getElementById("modalManage").classList.add("show");
+}
+
+function doDelEmp() {
+  const idx = parseInt(document.getElementById("selDelEmp").value);
+  if (isNaN(idx) || idx < 0 || idx >= data.length) return;
+  const name = data[idx].name;
+  if (!confirm("Permanently delete " + name + "?")) return;
+  data.splice(idx, 1);
+  lsSave();
+  render();
+  toast("🗑 " + name + " deleted");
+  showManage();
+}
+
+function doRenameEmp() {
+  const idx = parseInt(document.getElementById("selRenameEmp").value);
+  const newName = document.getElementById("inputRenameEmp").value.trim();
+  if (!newName) { toast("Enter new name"); return; }
+  if (isNaN(idx) || idx < 0 || idx >= data.length) { toast("Select staff"); return; }
+  const old = data[idx].name;
+  data[idx].name = newName;
+  lsSave();
+  render();
+  toast("✅ " + old + " → " + newName);
+  showManage();
+}
+
+function closeModals() {
+  document.getElementById("modalAddEmp").classList.remove("show");
+  document.getElementById("modalManage").classList.remove("show");
+}
+
+// ════════════════════════════════════════════════════════
+// DRAG & DROP
+// ════════════════════════════════════════════════════════
+function enableDrag() {
+  let dragIdx = null;
+  const rows = document.querySelectorAll("#mainTable tbody tr");
+  
+  rows.forEach(row => {
+    row.addEventListener("dragstart", e => {
+      dragIdx = parseInt(row.dataset.index);
+      setTimeout(() => { row.classList.add("dragging-row"); }, 0);
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    row.addEventListener("dragend", () => {
+      row.classList.remove("dragging-row");
+    });
+
+    row.addEventListener("dragover", e => {
+      e.preventDefault();
+      row.style.borderTop = "3px solid #38bdf8";
+    });
+
+    row.addEventListener("dragleave", () => {
+      row.style.borderTop = "";
+    });
+
+    row.addEventListener("drop", e => {
+      e.preventDefault();
+      row.style.borderTop = "";
+      const ti = parseInt(row.dataset.index);
+      if (dragIdx === null || dragIdx === ti) return;
+      const m = data.splice(dragIdx, 1)[0];
+      data.splice(ti, 0, m);
+      render();
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// INITIALIZE
+// ════════════════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  const now = new Date();
+  document.getElementById("monthPicker").value = 
+    now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+  
+  lsLoad();
+  render();
+  
+  document.getElementById("monthPicker").addEventListener("change", render);
+});
+</script>
+
+</body>
+</html>
